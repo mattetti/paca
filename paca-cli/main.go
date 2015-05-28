@@ -11,8 +11,8 @@ import (
 var (
 	source    = flag.String("source", "", "source path to the ide case path to convert")
 	overwrite = flag.Bool("overwrite", false, "overwrite the generated helper files")
-	dest      = flag.String("dest", "seltest", "path to the directory where to dump the converted cases")
-	pkgName   = flag.String("pkg", "seltest", "name of the Go package to use when generating cases")
+	dest      = flag.String("dest", "blackbox", "path to the directory where to dump the converted cases")
+	pkgName   = flag.String("pkg", "blackbox", "name of the Go package to use when generating cases")
 )
 
 func main() {
