@@ -11,6 +11,8 @@ import (
 var (
 	source    = flag.String("source", "", "source path to the ide case path to convert")
 	overwrite = flag.Bool("overwrite", false, "overwrite the generated helper files")
+	dest      = flag.String("dest", "seltest", "path to the directory where to dump the converted cases")
+	pkgName   = flag.String("pkg", "seltest", "name of the Go package to use when generating cases")
 )
 
 func main() {
@@ -24,24 +26,24 @@ func main() {
 		fmt.Printf("failed to process %s - %v\n", *source, err)
 		os.Exit(1)
 	}
-	_ = os.Mkdir("seltest", os.ModePerm)
+	_ = os.Mkdir(*dest, os.ModePerm)
 
-	helperFilename := "seltest/helper_test.go"
+	helperFilename := fmt.Sprintf("%s/helper_test.go", *dest)
 	if _, err := os.Stat(helperFilename); os.IsNotExist(err) || *overwrite {
-		f, err := os.Create("seltest/helper_test.go")
+		f, err := os.Create(helperFilename)
 		if err != nil {
 			panic(err)
 		}
 		defer f.Close()
-		f.WriteString(paca.HelperFileContent())
+		f.WriteString(paca.HelperFileContent(*pkgName))
 	}
 
-	f, err := os.Create(fmt.Sprintf("seltest/%s_test.go", paca.Camelize(ideCase.Title)))
+	f, err := os.Create(fmt.Sprintf("%s/%s_test.go", *dest, paca.Camelize(ideCase.Title)))
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
-	f.WriteString(ideCase.TestCode())
+	f.WriteString(ideCase.TestCode(*pkgName))
 
-	fmt.Printf("test case %s converted, check the seltest folder\n", ideCase.Title)
+	fmt.Printf("test case %s converted, check the %s folder\n", *dest, ideCase.Title)
 }

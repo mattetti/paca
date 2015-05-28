@@ -18,9 +18,9 @@ type ideCase struct {
 	Cmds  []*selCmd
 }
 
-func (c *ideCase) TestCode() string {
+func (c *ideCase) TestCode(pkgName string) string {
 	output := bytes.Buffer{}
-	output.WriteString("package seltest\n\nimport(\n\t\"testing\"\n\t\"time\"\n\n\t\"github.com/sclevine/agouti\"\n)\n")
+	output.WriteString(fmt.Sprintf("package %s\n\nimport(\n\t\"testing\"\n\t\"time\"\n\n\t\"github.com/sclevine/agouti\"\n)\n", pkgName))
 	output.WriteString("var _ = 42 * time.Second\n\n")
 	output.WriteString(fmt.Sprintf("func %s(t *testing.T, page *agouti.Page){\n", Camelize(c.Title)))
 	for _, cmd := range c.Cmds {
@@ -149,12 +149,19 @@ func Camelize(str string) string {
 	return output.String()
 }
 
-func HelperFileContent() string {
-	return `package seltest
+func HelperFileContent(pkgName string) string {
 
-import(
+	output := &bytes.Buffer{}
+	output.WriteString(fmt.Sprintf("package %s\n", pkgName))
+	output.WriteString(`
+import (
+	"fmt"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
+
 	"github.com/sclevine/agouti"
 )
 
@@ -189,5 +196,6 @@ func TestFirstScenario(t *testing.T) {
 	}
 	// call testFunction passing t and page
 }
-`
+`)
+	return output.String()
 }
